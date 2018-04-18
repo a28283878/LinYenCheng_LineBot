@@ -35,22 +35,28 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, event := range events {
 		if event.Type == linebot.EventTypeMessage {
-			switch message := event.Message.(type) {
+			switch event.Message.(type) {
 			case *linebot.TextMessage:
-				leftBtn := linebot.NewMessageTemplateAction("left", "left clicked")
-				rightBtn := linebot.NewMessageTemplateAction("right", "right clicked")
+				imageURL := "/101"
+				template := linebot.NewCarouselTemplate(
+					linebot.NewCarouselColumn(
+						imageURL, "hoge", "fuga",
+						linebot.NewURITemplateAction("Go to line.me", "https://line.me"),
+						linebot.NewPostbackTemplateAction("Say hello1", "hello こんにちは", ""),
+					),
+					linebot.NewCarouselColumn(
+						imageURL, "hoge", "fuga",
+						linebot.NewPostbackTemplateAction("言 hello2", "hello こんにちは", "hello こんにちは"),
+						linebot.NewMessageTemplateAction("Say message", "Rice=米"),
+					),
+				)
 
-				template := linebot.NewConfirmTemplate(fmt.Sprintf("Hello World %s", message), leftBtn, rightBtn)
-
-				messages := linebot.NewTemplateMessage("Sorry :(, please update your app.", template)
-
-				if _, err = bot.ReplyMessage(event.ReplyToken, messages).Do(); err != nil {
+				if _, err := bot.ReplyMessage(
+					event.ReplyToken,
+					linebot.NewTemplateMessage("Carousel alt text", template),
+				).Do(); err != nil {
 					log.Print(err)
 				}
-
-				// if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.ID+":"+message.Text+" OK!")).Do(); err != nil {
-				// 	log.Print(err)
-				// }
 			}
 		}
 	}
