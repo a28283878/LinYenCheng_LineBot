@@ -1,7 +1,11 @@
 package main
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -10,10 +14,16 @@ import (
 )
 
 var bot *linebot.Client
+var ChannelSecret string
+var ChannelAccessToken string
 
 func main() {
 	var err error
-	bot, err = linebot.New(os.Getenv("ChannelSecret"), os.Getenv("ChannelAccessToken"))
+
+	ChannelSecret = os.Getenv("ChannelSecret")
+	ChannelAccessToken = os.Getenv("ChannelAccessToken")
+
+	bot, err = linebot.New(ChannelSecret, ChannelAccessToken)
 	log.Println("Bot:", bot, " err:", err)
 	http.HandleFunc("/callback", callbackHandler)
 	port := os.Getenv("PORT")
@@ -22,6 +32,25 @@ func main() {
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Print(err)
+		w.WriteHeader(500)
+		return
+	}
+	decoded, err := base64.StdEncoding.DecodeString(r.Header.Get("X-Line-Signature"))
+	if err != nil {
+		log.Print(err)
+		w.WriteHeader(500)
+		return
+	}
+	hash := hmac.New(sha256.New, []byte(ChannelSecret))
+	hash.Write(body)
+
+	log.Printf("decoded : %s", decoded)
+	log.Printf("hash : %s", hash)
+
 	events, err := bot.ParseRequest(r)
 
 	if err != nil {
