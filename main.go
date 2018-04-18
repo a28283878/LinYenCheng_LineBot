@@ -37,7 +37,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		if event.Type == linebot.EventTypeMessage {
 			switch event.Message.(type) {
 			case *linebot.TextMessage:
-				imageURL := "/101"
+				imageURL := "assests/img/YDXJ0571.jpg"
 				template := linebot.NewCarouselTemplate(
 					linebot.NewCarouselColumn(
 						imageURL, "hoge", "fuga",
