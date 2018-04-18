@@ -13,16 +13,16 @@ import (
 )
 
 var bot *linebot.Client
-var ChannelSecret string
-var ChannelAccessToken string
+var channelSecret string
+var channelAccessToken string
 
 func main() {
 	var err error
 
-	ChannelSecret = os.Getenv("ChannelSecret")
-	ChannelAccessToken = os.Getenv("ChannelAccessToken")
+	channelSecret = os.Getenv("ChannelSecret")
+	channelAccessToken = os.Getenv("ChannelAccessToken")
 
-	bot, err = linebot.New(ChannelSecret, ChannelAccessToken)
+	bot, err = linebot.New(channelSecret, channelAccessToken)
 	log.Println("Bot:", bot, " err:", err)
 	http.HandleFunc("/callback", callbackHandler)
 	port := os.Getenv("PORT")
@@ -32,18 +32,21 @@ func main() {
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
 
+	//valid signature
 	decoded, err := base64.StdEncoding.DecodeString(r.Header.Get("X-Line-Signature"))
 	if err != nil {
 		log.Print(err)
 		w.WriteHeader(500)
 		return
 	}
-	hash := hmac.New(sha256.New, []byte(ChannelSecret))
+	hash := hmac.New(sha256.New, []byte(channelSecret))
 
 	if !hmac.Equal(decoded, hash.Sum(nil)) {
+		log.Printf("not post from Line server : %v", r)
 		w.WriteHeader(400)
 	}
 
+	//parse post
 	events, err := bot.ParseRequest(r)
 	if err != nil {
 		if err == linebot.ErrInvalidSignature {
@@ -54,6 +57,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//parse events
 	for _, event := range events {
 		if event.Type == linebot.EventTypeMessage {
 			switch event.Message.(type) {
