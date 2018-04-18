@@ -37,27 +37,18 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		if event.Type == linebot.EventTypeMessage {
 			switch event.Message.(type) {
 			case *linebot.TextMessage:
-				imageURL := "https://i.imgur.com/5IUHeme.jpg"
-				template := linebot.NewCarouselTemplate(
-					linebot.NewCarouselColumn(
-						imageURL, "hoge", "fuga",
-						linebot.NewURITemplateAction("Go to line.me", "https://line.me"),
-						linebot.NewPostbackTemplateAction("Say hello1", "hello こんにちは", ""),
-					),
-					linebot.NewCarouselColumn(
-						imageURL, "hoge", "fuga",
-						linebot.NewPostbackTemplateAction("言 hello2", "hello こんにちは", "hello こんにちは"),
-						linebot.NewMessageTemplateAction("Say message", "Rice=米"),
-					),
-				)
-
-				if _, err := bot.ReplyMessage(
-					event.ReplyToken,
-					linebot.NewTemplateMessage("Carousel alt text", template),
-				).Do(); err != nil {
-					log.Print(err)
-				}
+				messageReply(event)
 			}
+		}
+	}
+}
+
+func messageReply(event linebot.Event) {
+	message := event.Message.(*linebot.TextMessage)
+
+	if message.Text == "你在哪" {
+		if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewLocationMessage("捷克理工大學", "Zikova 1903/4, 166 36 Praha 6", 50.102974, 14.391177)).Do(); err != nil {
+			log.Print(err)
 		}
 	}
 }
