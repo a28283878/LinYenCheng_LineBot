@@ -32,3 +32,8 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[metadata.heroku]
+  root-package = "github.com/a28283878/LinYenCheng_LineBot"
+  go-version = "1.9.2"
+  install = [ "./..." ]
