@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -32,13 +31,7 @@ func main() {
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Print(err)
-		w.WriteHeader(500)
-		return
-	}
+
 	decoded, err := base64.StdEncoding.DecodeString(r.Header.Get("X-Line-Signature"))
 	if err != nil {
 		log.Print(err)
@@ -46,13 +39,12 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	hash := hmac.New(sha256.New, []byte(ChannelSecret))
-	hash.Write(body)
 
-	log.Printf("decoded : %s", decoded)
-	log.Printf("hash : %s", hash)
+	if !hmac.Equal(decoded, hash.Sum(nil)) {
+		w.WriteHeader(400)
+	}
 
 	events, err := bot.ParseRequest(r)
-
 	if err != nil {
 		if err == linebot.ErrInvalidSignature {
 			w.WriteHeader(400)
