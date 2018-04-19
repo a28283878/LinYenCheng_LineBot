@@ -22,7 +22,7 @@ func messageReply(event linebot.Event) {
 		resumeBtn := linebot.NewMessageTemplateAction("給我看履歷", "給我看履歷")
 		travelBtn := linebot.NewMessageTemplateAction("最近遊記", "最近遊記")
 
-		template := linebot.NewButtonsTemplate("https://farm1.staticflickr.com/799/41548719091_313673967f_m.jpg", "這裡有些範例問題呢",
+		template := linebot.NewButtonsTemplate("https://farm1.staticflickr.com/799/41548719091_313673967f_b.jpg", "這裡有些範例問題呢",
 			"選個看看吧", locationBtn, resumeBtn, travelBtn)
 		message := linebot.NewTemplateMessage("哎呀~ 這裡怎麼看不到呢", template)
 		if _, err := bot.ReplyMessage(event.ReplyToken, message).Do(); err != nil {
