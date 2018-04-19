@@ -88,14 +88,13 @@ func crawlBlog(num int) *linebot.CarouselTemplate {
 
 	// Find the review items
 	doc.Find(".posts-wrapper article").Each(func(i int, s *goquery.Selection) {
-		// For each item found, get the band and title
-		title := s.Text()
+		title := s.Find("a").Text()
 		postURL, _ := s.Find("a").Attr("href")
 		pictureURL, _ := s.Find("a").Find("div").Attr("style")
 		pictureURL = pictureURL[strings.Index(pictureURL, "(")+1 : strings.Index(pictureURL, ")")]
 
 		btn := linebot.NewURITemplateAction("觀看", postURL)
-		column := linebot.NewCarouselColumn(pictureURL, "遊記", title, btn)
+		column := linebot.NewCarouselColumn(pictureURL, "文章", title, btn)
 
 		carouselCols = append(carouselCols, column)
 	})
