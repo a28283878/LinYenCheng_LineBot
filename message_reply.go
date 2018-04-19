@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/line/line-bot-sdk-go/linebot"
 )
@@ -17,13 +18,26 @@ func messageReply(event linebot.Event) {
 		if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("https://docs.google.com/document/d/1eKjTU4ebTTUJrISXR5YcQ47Jki-Br4apP_EQT_K_dbA/edit?usp=sharing")).Do(); err != nil {
 			log.Print(err)
 		}
+	} else if message.Text == "你會哪些東西呢" {
+		skills := []string{"Golang", ".NET MVC", "Gitlab CI/CD"}
+		replyMessage := "我會很多東西呢\n--------"
+
+		for num, skill := range skills {
+			replyMessage += "\n" + strconv.Itoa(num) + skill
+		}
+		replyMessage += "等等等..."
+
+		if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("")).Do(); err != nil {
+			log.Print(err)
+		}
 	} else if message.Text == "嗨" {
 		locationBtn := linebot.NewMessageTemplateAction("你在哪交換", "你在哪交換")
 		resumeBtn := linebot.NewMessageTemplateAction("給我看履歷", "給我看履歷")
+		skillBtn := linebot.NewMessageTemplateAction("你會哪些東西呢", "你會哪些東西呢")
 		travelBtn := linebot.NewMessageTemplateAction("最近遊記", "最近遊記")
 
 		template := linebot.NewButtonsTemplate("https://farm1.staticflickr.com/799/41548719091_313673967f_b.jpg", "這裡有些範例問題呢",
-			"選個看看吧", locationBtn, resumeBtn, travelBtn)
+			"選個看看吧", locationBtn, resumeBtn, skillBtn, travelBtn)
 		message := linebot.NewTemplateMessage("哎呀~ 這裡怎麼看不到呢", template)
 		if _, err := bot.ReplyMessage(event.ReplyToken, message).Do(); err != nil {
 			log.Print(err)
