@@ -39,7 +39,7 @@ func messageReply(event linebot.Event) (err error) {
 		}
 	} else if message.Text == "最近文章" {
 		template := crawlBlog(postNumber)
-		packMessage := linebot.NewTemplateMessage("哎呀~ 這裡怎麼看不到呢", template)
+		packMessage := linebot.NewTemplateMessage("哎呀~ 要用手機看歐", template)
 		if _, err := bot.ReplyMessage(event.ReplyToken, packMessage).Do(); err != nil {
 			log.Print(err)
 			return err
@@ -53,7 +53,7 @@ func messageReply(event linebot.Event) (err error) {
 
 		template := linebot.NewButtonsTemplate("https://farm1.staticflickr.com/799/41548719091_313673967f_b.jpg", "這裡有些範例問題呢",
 			"選個看看吧", locationBtn, resumeBtn, skillBtn, travelBtn)
-		packMessage := linebot.NewTemplateMessage("哎呀~ 這裡怎麼看不到呢", template)
+		packMessage := linebot.NewTemplateMessage("哎呀~ 要用手機看歐", template)
 		if _, err := bot.ReplyMessage(event.ReplyToken, packMessage).Do(); err != nil {
 			log.Print(err)
 			return err
