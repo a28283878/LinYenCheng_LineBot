@@ -62,7 +62,11 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		if event.Type == linebot.EventTypeMessage {
 			switch event.Message.(type) {
 			case *linebot.TextMessage:
-				messageReply(event)
+				err = messageReply(event)
+				if err != nil {
+					w.WriteHeader(500)
+					return
+				}
 			}
 		}
 	}
