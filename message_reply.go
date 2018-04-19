@@ -37,6 +37,19 @@ func messageReply(event linebot.Event) (err error) {
 			log.Print(err)
 			return err
 		}
+	} else if message.Text == "你有哪些興趣呢" {
+		skills := []string{"游泳", "打羽毛球", "看美劇", "踏青", "在床上耍廢"}
+		replyMessage := "我有很多興趣呢\n\n"
+
+		for _, skill := range skills {
+			replyMessage += "\n" + skill
+		}
+		replyMessage += "\n\n等等等..."
+
+		if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
+			log.Print(err)
+			return err
+		}
 	} else if message.Text == "最近文章" {
 		template := crawlBlog(postNumber)
 		packMessage := linebot.NewTemplateMessage("哎呀~ 要用手機看歐", template)

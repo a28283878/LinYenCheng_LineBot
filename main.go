@@ -39,7 +39,7 @@ func initValues() {
 	travelBtn := linebot.NewMessageTemplateAction("最近文章", "最近文章")
 
 	questionTemplate = linebot.NewButtonsTemplate("https://farm1.staticflickr.com/799/41548719091_313673967f_b.jpg", "這裡有些範例問題呢",
-		"選個看看吧", locationBtn, skillBtn, travelBtn, hobbyBtn)
+		"選個看看吧", locationBtn, skillBtn, hobbyBtn, travelBtn)
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
