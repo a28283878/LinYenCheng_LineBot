@@ -22,10 +22,10 @@ func messageReply(event linebot.Event) (err error) {
 		}
 	} else if message.Text == "你會哪些東西呢" {
 		skills := []string{"Golang", ".NET MVC", "Gitlab CI/CD"}
-		replyMessage := "我會很多東西呢\n--------"
+		replyMessage := "我會很多東西呢\n----------------"
 
 		for num, skill := range skills {
-			replyMessage += "\n" + strconv.Itoa(num) + skill
+			replyMessage += "\n" + strconv.Itoa(num) + ".\t" + skill
 		}
 		replyMessage += "等等等..."
 
@@ -37,7 +37,10 @@ func messageReply(event linebot.Event) (err error) {
 		travelCol_1_browse := linebot.NewURITemplateAction("觀看", "https://a28283878.github.io/czech/Poland-Krakow.html")
 		travelCol_1 := linebot.NewCarouselColumn("https://a28283878.github.io/assets/img/Krakow.jpg", "Poland - Krakow", "美麗的波蘭舊首都", travelCol_1_browse)
 
-		template := linebot.NewCarouselTemplate(travelCol_1)
+		travelCol_2_browse := linebot.NewURITemplateAction("觀看", "https://a28283878.github.io/czech/Cesky-Krumlov.html")
+		travelCol_2 := linebot.NewCarouselColumn("https://a28283878.github.io/assets/img/czech-7.jpg", "Czech - Cesky Krumlov", "童話中的繽紛小鎮", travelCol_2_browse)
+
+		template := linebot.NewCarouselTemplate(travelCol_1, travelCol_2)
 		packMessage := linebot.NewTemplateMessage("哎呀~ 這裡怎麼看不到呢", template)
 		if _, err := bot.ReplyMessage(event.ReplyToken, packMessage).Do(); err != nil {
 			log.Print(err)
