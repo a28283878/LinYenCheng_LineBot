@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"strconv"
 
 	"github.com/line/line-bot-sdk-go/linebot"
 )
@@ -21,13 +20,13 @@ func messageReply(event linebot.Event) (err error) {
 			return err
 		}
 	} else if message.Text == "你會哪些東西呢" {
-		skills := []string{"Golang", ".NET MVC", "Gitlab CI/CD"}
-		replyMessage := "我會很多東西呢\n----------------"
+		skills := []string{"Golang", ".NET MVC", "Gitlab CI/CD", "Mysql", "Redis"}
+		replyMessage := "我會很多東西呢\n\n"
 
-		for num, skill := range skills {
-			replyMessage += "\n" + strconv.Itoa(num) + ".\t" + skill
+		for _, skill := range skills {
+			replyMessage += "\n" + skill
 		}
-		replyMessage += "等等等..."
+		replyMessage += "\n\n等等等..."
 
 		if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
 			log.Print(err)
