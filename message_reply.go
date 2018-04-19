@@ -9,6 +9,8 @@ import (
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
+var postNumber = 4
+
 func messageReply(event linebot.Event) (err error) {
 	message := event.Message.(*linebot.TextMessage)
 
@@ -36,7 +38,7 @@ func messageReply(event linebot.Event) (err error) {
 			return err
 		}
 	} else if message.Text == "最近文章" {
-		template := crawlBlog(4)
+		template := crawlBlog(postNumber)
 		packMessage := linebot.NewTemplateMessage("哎呀~ 這裡怎麼看不到呢", template)
 		if _, err := bot.ReplyMessage(event.ReplyToken, packMessage).Do(); err != nil {
 			log.Print(err)
@@ -88,6 +90,9 @@ func crawlBlog(num int) *linebot.CarouselTemplate {
 
 	// Find the review items
 	doc.Find(".posts-wrapper article").Each(func(i int, s *goquery.Selection) {
+		if i >= num {
+			return
+		}
 		title := s.Find("a").Text()
 		postURL, _ := s.Find("a").Attr("href")
 		pictureURL, _ := s.Find("a").Find("div").Attr("style")
