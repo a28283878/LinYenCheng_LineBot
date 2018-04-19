@@ -2,7 +2,10 @@ package main
 
 import (
 	"log"
+	"net/http"
+	"strings"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
@@ -32,14 +35,8 @@ func messageReply(event linebot.Event) (err error) {
 			log.Print(err)
 			return err
 		}
-	} else if message.Text == "最近遊記" {
-		travelCol_1_browse := linebot.NewURITemplateAction("觀看", "https://a28283878.github.io/czech/Poland-Krakow.html")
-		travelCol_1 := linebot.NewCarouselColumn("https://a28283878.github.io/assets/img/Krakow.jpg", "Poland - Krakow", "美麗的波蘭舊首都", travelCol_1_browse)
-
-		travelCol_2_browse := linebot.NewURITemplateAction("觀看", "https://a28283878.github.io/czech/Cesky-Krumlov.html")
-		travelCol_2 := linebot.NewCarouselColumn("https://a28283878.github.io/assets/img/czech-7.jpg", "Czech - Cesky Krumlov", "童話中的繽紛小鎮", travelCol_2_browse)
-
-		template := linebot.NewCarouselTemplate(travelCol_1, travelCol_2)
+	} else if message.Text == "最近文章" {
+		template := crawlBlog(4)
 		packMessage := linebot.NewTemplateMessage("哎呀~ 這裡怎麼看不到呢", template)
 		if _, err := bot.ReplyMessage(event.ReplyToken, packMessage).Do(); err != nil {
 			log.Print(err)
@@ -50,7 +47,7 @@ func messageReply(event linebot.Event) (err error) {
 		locationBtn := linebot.NewMessageTemplateAction("你在哪交換", "你在哪交換")
 		resumeBtn := linebot.NewMessageTemplateAction("給我看履歷", "給我看履歷")
 		skillBtn := linebot.NewMessageTemplateAction("你會哪些東西呢", "你會哪些東西呢")
-		travelBtn := linebot.NewMessageTemplateAction("最近遊記", "最近遊記")
+		travelBtn := linebot.NewMessageTemplateAction("最近文章", "最近文章")
 
 		template := linebot.NewButtonsTemplate("https://farm1.staticflickr.com/799/41548719091_313673967f_b.jpg", "這裡有些範例問題呢",
 			"選個看看吧", locationBtn, resumeBtn, skillBtn, travelBtn)
@@ -68,4 +65,42 @@ func messageReply(event linebot.Event) (err error) {
 	}
 
 	return nil
+}
+
+func crawlBlog(num int) *linebot.CarouselTemplate {
+	template := linebot.NewCarouselTemplate()
+	carouselCols := []*linebot.CarouselColumn{}
+	// Request the HTML page.
+	res, err := http.Get("https://a28283878.github.io/")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+	}
+
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Find the review items
+	doc.Find(".posts-wrapper article").Each(func(i int, s *goquery.Selection) {
+		// For each item found, get the band and title
+		title := s.Text()
+		postURL, _ := s.Find("a").Attr("href")
+		pictureURL, _ := s.Find("a").Find("div").Attr("style")
+		pictureURL = pictureURL[strings.Index(pictureURL, "(")+1 : strings.Index(pictureURL, ")")]
+
+		btn := linebot.NewURITemplateAction("觀看", postURL)
+		column := linebot.NewCarouselColumn(pictureURL, "遊記", title, btn)
+
+		carouselCols = append(carouselCols, column)
+	})
+
+	template = linebot.NewCarouselTemplate(carouselCols...)
+
+	return template
 }
