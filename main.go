@@ -67,6 +67,11 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(500)
 					return
 				}
+			default:
+				if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("哎呀！沒有辦法回答這東西呢！")).Do(); err != nil {
+					log.Print(err)
+					return
+				}
 			}
 		} else if event.Type == linebot.EventTypeFollow {
 			err = followAction(event)
