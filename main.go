@@ -68,6 +68,12 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 			}
+		} else if event.Type == linebot.EventTypeFollow {
+			err = followAction(event)
+			if err != nil {
+				w.WriteHeader(500)
+				return
+			}
 		}
 	}
 }
