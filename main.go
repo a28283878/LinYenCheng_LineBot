@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -69,7 +70,8 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					log.Print(err)
 					return
 				}
-				log.Printf("Unhandle message type : %v", &event)
+				b, _ := json.Marshal(&event)
+				log.Printf("Unhandle message type : %s", string(b))
 			}
 		} else if event.Type == linebot.EventTypeFollow {
 			err = followAction(event)
@@ -79,7 +81,8 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		} else {
-			log.Printf("Unhandle event type : %v", &event)
+			b, _ := json.Marshal(&event)
+			log.Printf("Unhandle event type : %s", string(b))
 			if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("哎呀！沒有辦法回答這東西呢！")).Do(); err != nil {
 				log.Print(err)
 				return
