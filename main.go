@@ -54,7 +54,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	hash := hmac.New(sha256.New, []byte(channelSecret))
 
 	if !hmac.Equal(decoded, hash.Sum(nil)) {
-		log.Printf("not post from Line server : %s \n %s", decoded, hash.Sum(nil))
+		log.Printf("not post from Line server : %s \n %s", channelSecret, hash.Sum(nil))
 		w.WriteHeader(400)
 		return
 	}
