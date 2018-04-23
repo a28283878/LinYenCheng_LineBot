@@ -69,7 +69,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					log.Print(err)
 					return
 				}
-				log.Printf("Unhandle message type : %v", &event.Message)
+				log.Printf("Unhandle message type : %v", &event)
 			}
 		} else if event.Type == linebot.EventTypeFollow {
 			err = followAction(event)
