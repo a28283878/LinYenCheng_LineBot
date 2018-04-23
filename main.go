@@ -56,6 +56,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	if !hmac.Equal(decoded, hash.Sum(nil)) {
 		log.Printf("not post from Line server : %v", r)
 		w.WriteHeader(400)
+		return
 	}
 
 	//parse post
