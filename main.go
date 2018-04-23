@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -85,7 +86,13 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					log.Print(err)
 					return
 				}
-				log.Printf("Unhandle message type : %v", event.Message)
+				b, err := json.Marshal(&event.Message)
+				if err != nil {
+					log.Print(err)
+					w.WriteHeader(500)
+					return
+				}
+				log.Printf("Unhandle message type : %v", b)
 			}
 		} else if event.Type == linebot.EventTypeFollow {
 			err = followAction(event)
