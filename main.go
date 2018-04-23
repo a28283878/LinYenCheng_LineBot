@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -52,6 +53,10 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	hash := hmac.New(sha256.New, []byte(channelSecret))
+
+	defer r.Body.Close()
+	body, _ := ioutil.ReadAll(r.Body)
+	hash.Write(body)
 
 	if !hmac.Equal(decoded, hash.Sum(nil)) {
 		log.Printf("not post from Line server : %s \n %s", channelSecret, hash.Sum(nil))
