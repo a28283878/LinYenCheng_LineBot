@@ -4,7 +4,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -86,13 +85,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					log.Print(err)
 					return
 				}
-				b, err := json.Marshal(&event.Message)
-				if err != nil {
-					log.Print(err)
-					w.WriteHeader(500)
-					return
-				}
-				log.Printf("Unhandle message type : %v", b)
+				log.Printf("Unhandle message type : %v", &event.Message)
 			}
 		} else if event.Type == linebot.EventTypeFollow {
 			err = followAction(event)
@@ -102,6 +95,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		} else {
+			log.Printf("Unhandle event type : %v", &event)
 			if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("哎呀！沒有辦法回答這東西呢！")).Do(); err != nil {
 				log.Print(err)
 				return
