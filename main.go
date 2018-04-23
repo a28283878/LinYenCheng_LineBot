@@ -76,6 +76,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			case *linebot.TextMessage:
 				err = messageReply(event)
 				if err != nil {
+					log.Print(err)
 					w.WriteHeader(500)
 					return
 				}
@@ -84,11 +85,13 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					log.Print(err)
 					return
 				}
+				log.Printf("Unhandle message type : %s", event.Message)
 			}
 		} else if event.Type == linebot.EventTypeFollow {
 			err = followAction(event)
 			if err != nil {
 				w.WriteHeader(500)
+				log.Print(err)
 				return
 			}
 		} else {
