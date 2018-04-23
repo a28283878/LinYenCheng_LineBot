@@ -1,11 +1,7 @@
 package main
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -44,33 +40,15 @@ func initValues() {
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
-
-	//valid signature
-	decoded, err := base64.StdEncoding.DecodeString(r.Header.Get("X-Line-Signature"))
-	if err != nil {
-		log.Print(err)
-		w.WriteHeader(500)
-		return
-	}
-	hash := hmac.New(sha256.New, []byte(channelSecret))
-
-	defer r.Body.Close()
-	body, _ := ioutil.ReadAll(r.Body)
-	hash.Write(body)
-
-	if !hmac.Equal(decoded, hash.Sum(nil)) {
-		log.Printf("not post from Line server : %s \n %s", channelSecret, hash.Sum(nil))
-		w.WriteHeader(400)
-		return
-	}
-
 	//parse post
 	events, err := bot.ParseRequest(r)
 	if err != nil {
 		if err == linebot.ErrInvalidSignature {
 			w.WriteHeader(400)
+			log.Print(err)
 		} else {
 			w.WriteHeader(500)
+			log.Print(err)
 		}
 		return
 	}
